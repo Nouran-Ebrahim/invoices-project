@@ -100,14 +100,15 @@ class InvoicesController extends Controller
         // $user = User::first();
         // Notification::send($user, new Addinvoice($invoice_id));
         // $user->notify(new Addinvoice($invoice_id));
-        $user = User::get();
+        $user = User::first();
         $invoices = invoices::latest()->first();
-        Notification::send($user, new Add_invoice_new($invoices));
+
+         return Notification::send($user, new Add_invoice_new($invoices));
 
         //event(new MyEventClass('hello world'));
 
-        session()->flash('Add', 'تم اضافة الفاتورة بنجاح');
-        return back();
+        // session()->flash('Add', 'تم اضافة الفاتورة بنجاح');
+        // return back();
     }
 
 
@@ -116,7 +117,7 @@ class InvoicesController extends Controller
         $invoices = invoices::where('id', $id)->first();
         return view('invoices.status_update', compact('invoices'));
     }
-    public function status_update($id,Request $request)
+    public function status_update($id, Request $request)
     {
         $invoices = invoices::findOrFail($id);
 
@@ -139,9 +140,7 @@ class InvoicesController extends Controller
                 'Payment_Date' => $request->Payment_Date,
                 'user' => (Auth::user()->name),
             ]);
-        }
-
-        else {
+        } else {
             $invoices->update([
                 'value_status' => 3,
                 'status' => $request->Status,
@@ -222,28 +221,60 @@ class InvoicesController extends Controller
         }
     }
 
-    public function Invoice_Paid(){
+    public function Invoice_Paid()
+    {
         $invoices = invoices::where('value_status', 1)->get();
         return view('invoices.invoice_paid', [
             'invoices' => $invoices
         ]);
     }
-    public function Invoice_UnPaid(){
+    public function Invoice_UnPaid()
+    {
         $invoices = invoices::where('value_status', 2)->get();
         return view('invoices.invoice_unpaid', [
             'invoices' => $invoices
         ]);
     }
-    public function Invoice_Partial(){
+    public function Invoice_Partial()
+    {
         $invoices = invoices::where('value_status', 3)->get();
         return view('invoices.invoice_partial', [
             'invoices' => $invoices
         ]);
     }
-    public function Print_invoice($id){
+    public function Print_invoice($id)
+    {
         $invoices = invoices::where('id', $id)->first();
         return view('invoices.Print_invoice', [
             'invoices' => $invoices
         ]);
+    }
+
+    public function MarkAsRead_all(Request $request)
+    {
+
+        $userUnreadNotification = auth()->user()->unreadNotifications;
+
+        if ($userUnreadNotification) {
+            $userUnreadNotification->markAsRead();
+            return back();
+        }
+
+
+    }
+
+    public function unreadNotifications_count()
+    {
+        return auth()->user()->unreadNotifications->count();
+    }
+
+    public function unreadNotifications()
+    {
+        foreach (auth()->user()->unreadNotifications as $notification) {
+
+            return $notification->data['title'];
+
+        }
+
     }
 }

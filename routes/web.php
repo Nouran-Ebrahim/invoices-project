@@ -76,4 +76,8 @@ Route::post('Search_invoices',[Invoices_Report::class,'Search_invoices']);
 Route::get('customers_report',[Customers_Report::class,'index'])->name("customers_report");
 Route::post('Search_customers',[Customers_Report::class,'Search_customers']);
 
+Route::get('MarkAsRead_all','InvoicesController@MarkAsRead_all')->name('MarkAsRead_all');
+Route::get('unreadNotifications_count', 'InvoicesController@unreadNotifications_count')->name('unreadNotifications_count');
+Route::get('unreadNotifications', 'InvoicesController@unreadNotifications')->name('unreadNotifications');
+
 Route::get('/{page}', [AdminController::class,'index' ]);

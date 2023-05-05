@@ -12,7 +12,7 @@ use App\Models\invoices;
 class Add_invoice_new extends Notification
 {
     use Queueable;
-    private $invoices;
+    public $invoices;
 
     /**
      * Create a new notification instance.
